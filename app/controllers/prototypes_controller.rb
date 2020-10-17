@@ -1,4 +1,7 @@
 class PrototypesController < ApplicationController
+  before_action :authenticate_user!, except: [:index,:show]
+  before_action :ensure_current_user, only: :edit
+
   def index
     @prototypes = Prototype.all
   end
@@ -48,4 +51,15 @@ class PrototypesController < ApplicationController
   def prototype_params
     params.require(:prototype).permit(:title,:catch_copy,:concept,:image).merge(user_id: current_user.id)
   end
+
+  def ensure_current_user
+    @prototype = Prototype.find(params[:id])
+    @user = current_user
+    if @user.id != @prototype.user_id
+      redirect_to root_path
+    end
+  end
+
+
+
 end
